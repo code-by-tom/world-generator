@@ -1,0 +1,40 @@
+[gd_scene load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://worldgen/core/world_generator_3d.gd" id="1_wgen"]
+[ext_resource type="Script" path="res://worldgen/passes/terrain_pass.gd" id="2_terrain"]
+[ext_resource type="Script" path="res://worldgen/strategies/noise_terrain_strategy.gd" id="3_noise"]
+[ext_resource type="Script" path="res://worldgen/passes/structure_pass.gd" id="4_struct"]
+[ext_resource type="Script" path="res://worldgen/strategies/bsp_structure_strategy.gd" id="5_bsp"]
+[ext_resource type="Script" path="res://worldgen/passes/navmesh_bake_pass.gd" id="6_nav"]
+
+[sub_resource type="Resource" id="Resource_noise"]
+script = ExtResource("3_noise")
+resolution = Vector2i(64, 64)
+cell_size = 4.0
+height_scale = 24.0
+noise_frequency = 0.02
+
+[sub_resource type="Resource" id="Resource_bsp"]
+script = ExtResource("5_bsp")
+footprint_size = Vector2(48, 48)
+max_depth = 4
+min_leaf_size = 8.0
+room_padding = 1.0
+corridor_width = 2.0
+
+[node name="WorldGenerator3D" type="Node3D"]
+script = ExtResource("1_wgen")
+world_seed = 12345
+world_bounds = AABB(-64, -16, -64, 128, 32, 128)
+
+[node name="TerrainPass" type="Node3D" parent="."]
+script = ExtResource("2_terrain")
+strategy = SubResource("Resource_noise")
+
+[node name="StructurePass" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 2, 10)
+script = ExtResource("4_struct")
+strategy = SubResource("Resource_bsp")
+
+[node name="NavMeshBakePass" type="Node3D" parent="."]
+script = ExtResource("6_nav")
